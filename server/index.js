@@ -1,9 +1,13 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import dotenv from 'dotenv'
+import connectDB from './utils/db.connection.js'
+
+dotenv.config({path: 'config.env'})
 
 const app = express()
-const port = 7000
+const port = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -20,6 +24,7 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(port, (err) => {
+    connectDB()
     if(err) {
         console.log(`There's an error in setup: ${err}`)
     } else {
