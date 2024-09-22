@@ -1,5 +1,5 @@
 import { User } from "../models/user.models.js"
-import bcrytp from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 export const register = async (req, res) => {
@@ -21,7 +21,7 @@ export const register = async (req, res) => {
             })
         }
 
-        const hashedPassword = await bcrytp.hash(password, 16)
+        const hashedPassword = await bcrypt.hash(password, 16)
 
         await User.create({
             firstName, lastName, gender, email, password: hashedPassword, phoneNumber, role
@@ -40,14 +40,16 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const {email, password, role} = req.body
-
+        console.log("Check 1")
+        
         if( !email || !password || !role ) {
             return res.status(400).json({
                 message: "Some fileds are missing",
                 success: false
             })
         }
-
+        
+        console.log("Check 2")
         let user = User.findOne({email})
         if(!user) {
             return res.status(400).json({
@@ -55,8 +57,9 @@ export const login = async (req, res) => {
                 success: false
             })
         }
+        console.log("Check 3")
         
-        const isPasswordCorrect = await bcrytp.compare(password, user.password)
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
         
         if(!isPasswordCorrect) {
             return res.status(400).json({
@@ -64,6 +67,7 @@ export const login = async (req, res) => {
                 success: false
             })
         }
+        console.log("Check 4")
         
         if(role != user.role) {
             return res.status(400).json({
@@ -71,12 +75,14 @@ export const login = async (req, res) => {
                 success: false
             })
         }
-
+        console.log("Check 5")
+        
         const tokenData = {
             userId: user._id
         }
+        console.log("Check 6")
         const token = jwt.sign(tokenData, process.env.SECRETKEY, {expiresIn: '1d'})
-
+        
         user = {
             _id: user._id,
             firstName: user.firstName,
@@ -87,7 +93,8 @@ export const login = async (req, res) => {
             role: user.role,
             profile: user.profile
         }
-
+        console.log("Check 7")
+        
         return res.status(200).cookie('token', token, {maxAge: 1*24*60*60*1000, httpsOnly: true, sameSite: 'strict'}).json({
             message: `Welcome back, ${user.firstName}!`,
             user,
@@ -107,5 +114,63 @@ export const logout = async (req, res) => {
         })
     } catch (err) {
         console.log(`error at logout controller backend: ${err}`)
+    }
+}
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { firstName, lastName, email, phoneNumber, bio, skills } = req.body
+
+        const file = req.file
+
+
+        if(!firstName || !lastName || !email || !bio || !skills || !phoneNumber) {
+            return res.status(400).json({
+                message: "Some field is missing",
+                success: false
+            })
+        }
+
+        const skillsArray = skills.split(",")
+        const userId = req.id // check for errors once in live (_)       
+
+        let user = await User.findById(userId)
+        if(!user) {
+            return res.status(400).json({
+                message: "User is invalid!",
+                success: false
+            })
+        }
+
+        
+        user.firstName = firstName
+        user.lastName = lastName
+        user.email = email
+        user.phoneNumber = phoneNumber
+        user.profile.bio = bio
+        user.profile.skills = skillsArray
+
+        await user.save()
+
+        user = {
+            _id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            gender: user.gender,
+            role: user.role,
+            profile: user.profile
+        }
+
+        return res.status(200).json({
+            message: "Profile Updated Successfully",
+            user,
+            success: true
+        })
+        
+
+    } catch (err) {
+        console.log(`error at updateProfile controller backend: ${err}`)
     }
 }

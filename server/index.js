@@ -4,6 +4,9 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import connectDB from './utils/db.connection.js'
 
+import userRoute from './routes/user.routes.js'
+
+
 dotenv.config({path: 'config.env'})
 
 const app = express()
@@ -18,6 +21,9 @@ const corsOption = {
 }
 
 app.use(cors(corsOption))
+
+app.use("/api/v1/user", userRoute)
+
 
 app.get('/', async (req, res) => {
     return res.status(200).json({msg: "everythings alright!"})
