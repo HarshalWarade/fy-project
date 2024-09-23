@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 import connectDB from './utils/db.connection.js'
 
 import userRoute from './routes/user.routes.js'
-
+import companyRoute from './routes/company.routes.js'
 
 dotenv.config({path: 'config.env'})
 
@@ -23,6 +23,7 @@ const corsOption = {
 app.use(cors(corsOption))
 
 app.use("/api/v1/user", userRoute)
+app.use("/api/v1/company", companyRoute)
 
 
 app.get('/', async (req, res) => {
