@@ -50,7 +50,7 @@ export const login = async (req, res) => {
         }
         
         console.log("Check 2")
-        let user = User.findOne({email})
+        let user = await User.findOne({email})
         if(!user) {
             return res.status(400).json({
                 message: "Incorrect Credentials!",
