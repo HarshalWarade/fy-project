@@ -10,7 +10,13 @@ import {
   SelectItem,
 } from "../ui/select";
 import { Button } from "../ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { USER_API_ENDPOINT } from "@/utils/constant";
+import { toast } from "sonner";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "@/redux/authSlice";
+import { Loader2 } from "lucide-react";
 
 const countries = [
   { name: "Afghanistan", code: "+93", flag: "https://flagcdn.com/w320/af.png" },
@@ -338,19 +344,77 @@ const countries = [
 ];
 
 const SignUp = () => {
-  const [selectedCountry, setSelectedCountry] = useState({});
-  const [phoneNumber, setPhoneNumber] = useState("");
 
+  const { loading } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate()
+
+  const [selectedCountry, setSelectedCountry] = useState("");
   const handleCountryChange = (value) => {
     const country = countries.find((country) => country.name === value);
     setSelectedCountry(country);
   };
+
+  const [input, setInput] = useState({
+    firstName: "",
+    email: "",
+    middleName: "",
+    lastName: "",
+    phoneNumber: "",
+    password: "",
+    role: "",
+    gender: "",
+    country: "",
+  });
+
+  const eventHandler = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
+  };
+
+  // file handling for future
+  const fileHandler = (e) => {
+    setInput({ ...input, file: e.target.files?.[0] });
+  };
+
+  const formHandler = async (e) => {
+    e.preventDefault();
+    const formData = new FormData()
+    formData.append("firstName", input.firstName)
+    formData.append("middleName", input.middleName)
+    formData.append("lastName", input.lastName)
+    formData.append("email", input.email)
+    formData.append("password", input.password)
+    formData.append("country", input.country)
+    formData.append("phoneNumber", input.phoneNumber)
+    formData.append("gender", input.gender)
+    formData.append("role", input.role)
+    try {
+      dispatch(setLoading(true))
+      const res = await axios.post(`${USER_API_ENDPOINT}/register`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        },
+        withCredentials: true
+      })
+      if(res.data.success) {
+        navigate("/login")
+        toast.success(res.data.message)
+      }
+    } catch (error) {
+      toast.error(error.response.data.message)
+    }
+    finally {
+      dispatch(setLoading(false))
+    }
+  };
+
   return (
     <>
       <Navbar />
       <div className="flex items-center justify-center max-w-7xl mx-auto">
         <form
-          action=""
+          onSubmit={formHandler}
           className="border flex flex-col gap-3 border-gray-200 bg-slate-50 rounded-md p-4 my-5"
         >
           <h1 className="font-bold text-2xl mb-5 mt-3 text-center">Sign Up</h1>
@@ -362,6 +426,8 @@ const SignUp = () => {
               <Input
                 type="text"
                 name="firstName"
+                value={input.firstName}
+                onChange={eventHandler}
                 className="focus-visible:ring-3 bg-white"
                 placeholder="Enter your first name"
                 autoComplete="off"
@@ -371,6 +437,9 @@ const SignUp = () => {
               <Label>Middle Name</Label>
               <Input
                 type="text"
+                name="middleName"
+                value={input.middleName}
+                onChange={eventHandler}
                 className="focus-visible:ring-3 bg-white"
                 placeholder="Enter your middle name"
                 autoComplete="off"
@@ -383,6 +452,8 @@ const SignUp = () => {
               <Input
                 type="text"
                 name="lastName"
+                value={input.lastName}
+                onChange={eventHandler}
                 className="focus-visible:ring-3 bg-white"
                 placeholder="Enter your last name"
                 autoComplete="off"
@@ -397,6 +468,8 @@ const SignUp = () => {
               </Label>
               <Input
                 type="email"
+                value={input.email}
+                onChange={eventHandler}
                 className="focus-visible:ring-3 bg-white"
                 name="email"
                 placeholder="Please provide a working email address"
@@ -407,7 +480,11 @@ const SignUp = () => {
               <Label>
                 Gender <span className="text-red-600">*</span>
               </Label>
-              <Select className="focus-visible:ring-0 bg-white">
+              <Select
+                onValueChange={(value) => setInput({ ...input, gender: value })}
+                value={input.gender}
+                className="focus-visible:ring-0 bg-white"
+              >
                 <SelectTrigger className="w-[180px] focus-visible:ring-0 bg-white">
                   <SelectValue placeholder="Choose" />
                 </SelectTrigger>
@@ -437,6 +514,8 @@ const SignUp = () => {
               <Input
                 type="password"
                 name="password"
+                value={input.password}
+                onChange={eventHandler}
                 className="focus-visible:ring-3 bg-white"
                 placeholder="Create a strong password"
                 autoComplete="off"
@@ -459,16 +538,19 @@ const SignUp = () => {
                 Country <span className="text-red-600">*</span>
               </Label>
               <Select
-                onValueChange={handleCountryChange}
+                onValueChange={(value) =>
+                  setInput({ ...input, country: value })
+                }
+                value={input.country}
                 className="focus-visible:ring-0 bg-white"
               >
                 <SelectTrigger className="w-full focus-visible:ring-0 bg-white">
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
                 <SelectContent className="focus-visible:ring-0 bg-white">
-                  {countries.map((country) => (
+                  {countries.map((country, index) => (
                     <SelectItem
-                      key={country.code}
+                      key={index}
                       value={country.name}
                       className="flex items-center focus-visible:ring-0 bg-white"
                     >
@@ -494,10 +576,10 @@ const SignUp = () => {
                 <Input
                   type="tel"
                   name="phoneNumber"
+                  onChange={eventHandler}
                   className="focus-visible:ring-3 bg-white flex-1"
                   placeholder="Enter your phone number"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  value={input.phoneNumber}
                   autoComplete="off"
                 />
               </div>
@@ -506,7 +588,11 @@ const SignUp = () => {
               <Label>
                 Role <span className="text-red-600">*</span>
               </Label>
-              <Select className="focus-visible:ring-0 bg-white">
+              <Select
+                onValueChange={(value) => setInput({ ...input, role: value })}
+                value={input.role}
+                className="focus-visible:ring-0 bg-white"
+              >
                 <SelectTrigger className="w-[180px] focus-visible:ring-0 bg-white">
                   <SelectValue placeholder="Choose" />
                 </SelectTrigger>
@@ -528,8 +614,22 @@ const SignUp = () => {
             </div>
           </div>
           <div className="flex items-center flex-col gap-2 justify-center content-center my-5">
-            <Button className="w-1/2" type="Submit">Submit</Button>
-            <span>Already have an account? <Link className="text-blue-500 hover:underline" to="/login">login </Link></span>
+            {loading ? (
+              <Button className="w-full cursor-not-allowed">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Please Wait
+              </Button>
+            ) : (
+              <Button className="w-full" type="Submit">
+                Submit
+              </Button>
+            )}
+            <span>
+              Don't have an account?
+              <Link className="text-blue-500 hover:underline" to="/signup">
+                Sign up
+              </Link>
+            </span>
           </div>
         </form>
       </div>

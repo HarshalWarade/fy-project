@@ -4,15 +4,13 @@ import jwt from 'jsonwebtoken'
 
 export const register = async (req, res) => {
     try {
-        const {firstName, lastName, gender, email, password, phoneNumber, role} = req.body
-
-        if(!firstName || !lastName || !gender || !email || !password || !phoneNumber || !role) {
+        const {firstName, middleName, lastName, gender, email, password, country, phoneNumber, role} = req.body
+        if(!firstName || !lastName || !gender || !email || !password || !country || !phoneNumber || !role) {
             return res.status(400).json({
                 message: "Some field is missing",
                 success: false
             })
         }
-
         const user = await User.findOne({email})
         if(user) {
             return res.status(400).json({
@@ -24,7 +22,7 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 16)
 
         await User.create({
-            firstName, lastName, gender, email, password: hashedPassword, phoneNumber, role
+            firstName, lastName, middleName, gender, email, country, password: hashedPassword, phoneNumber, role
         })
 
         return res.status(201).json({
@@ -40,7 +38,6 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const {email, password, role} = req.body
-        console.log("Check 1")
         
         if( !email || !password || !role ) {
             return res.status(400).json({
@@ -49,7 +46,6 @@ export const login = async (req, res) => {
             })
         }
         
-        console.log("Check 2")
         let user = await User.findOne({email})
         if(!user) {
             return res.status(400).json({
@@ -57,9 +53,8 @@ export const login = async (req, res) => {
                 success: false
             })
         }
-        console.log("Check 3")
         
-        const isPasswordCorrect = bcrypt.compare(password, user.password)
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
         
         if(!isPasswordCorrect) {
             return res.status(400).json({
@@ -67,7 +62,6 @@ export const login = async (req, res) => {
                 success: false
             })
         }
-        console.log("Check 4")
         
         if(role != user.role) {
             return res.status(400).json({
@@ -75,12 +69,10 @@ export const login = async (req, res) => {
                 success: false
             })
         }
-        console.log("Check 5")
         
         const tokenData = {
             userId: user._id
         }
-        console.log("Check 6")
         const token = jwt.sign(tokenData, process.env.SECRETKEY, {expiresIn: '1d'})
         
         user = {
@@ -93,7 +85,6 @@ export const login = async (req, res) => {
             role: user.role,
             profile: user.profile
         }
-        console.log("Check 7")
         
         return res.status(200).cookie('token', token, {maxAge: 1*24*60*60*1000, httpsOnly: true, sameSite: 'strict'}).json({
             message: `Welcome back, ${user.firstName}!`,
