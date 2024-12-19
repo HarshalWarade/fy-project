@@ -23,15 +23,15 @@ const LatestJobCard = () => {
         </p>
       </div>
       <div className="flex items-center gap-2 mt-4">
-        <Button className="transform duration-300 ease-in-out bg-orange-50 outline-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white">Details and Apply</Button>
+        <Button className="transform duration-300 ease-in-out border bg-slate-100 outline-slate-600 text-slate-600 hover:bg-slate-600 hover:text-white">Details and Apply</Button>
         <Badge
-          className={`text-green-500 bg-green-100 font-semibold`}
+          className={`text-lime-500 bg-lime-50 outline-none border font-semibold`}
           variant="ghost"
         >
           Today
         </Badge>
         <Badge
-          className={`text-yellow-500 bg-yellow-100 font-semibold`}
+          className={`text-lime-500 bg-lime-50 outline-none border font-semibold`}
           variant="ghost"
         >
           Part-time

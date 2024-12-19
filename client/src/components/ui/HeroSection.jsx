@@ -6,12 +6,12 @@ const HeroSection = () => {
   return (
     <div className="text-center">
       <div className="flex flex-col gap-5 my-10">
-        <span className="px-4 py-2 rounded-full font-semibold mx-auto bg-orange-100 text-orange-600">
+        <span className="px-4 py-2 rounded-full font-semibold mx-auto bg-lime-100 text-lime-600">
           No 1. Job Hunting Portal
         </span>
         <h1 className="text-5xl font-bold flex flex-col gap-2">
           <p>Search and Apply</p>
-          <p>Get your <span className="text-orange-600">dream</span> job</p>
+          <p>Get your <span className="text-lime-600">dream</span> job</p>
         </h1>
         <p className="my-4">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Similique maxime fugiat pariatur assumenda, provident iure?</p>
         <div className="flex w-[40%] border border-gray-300 pl-3 rounded-md items-center gap-4 mx-auto">
