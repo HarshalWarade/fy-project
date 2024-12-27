@@ -5,9 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { toast, Toaster } from "sonner";
 import { LogOut, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import store from "@/redux/store";
 
 const Navbar = () => {
-  const user = true // hard coded value
+  const {user} = useSelector(store => store.auth)
   return (
     <>
       <div className="bg-white">
