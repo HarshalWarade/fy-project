@@ -61,7 +61,7 @@ const Navbar = () => {
                         variant="link"
                         className="outline-none border-none"
                       >
-                        View Profile
+                        <Link to="/profile">View Profile</Link>
                       </Button>
                     </div>
                     <div className="flex w-fit items-center gap-3 text-gray-600">
