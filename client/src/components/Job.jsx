@@ -3,8 +3,13 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import { useNavigate } from "react-router-dom";
 
 const Job = () => {
+  const navigate = useNavigate();
+
+  const jobId = "sad3asd849asjhdajshd"
+
   return (
     <div>
       <div className="p-5 rounded-md border bg-white shadow-md border-gray-200">
@@ -45,31 +50,26 @@ const Job = () => {
         </div>
 
         <div className="flex items-center gap-2 mt-4">
-          <Badge
-            className={`text-green-600 font-semibold`}
-            variant="ghost"
-          >
+          <Badge className={`text-green-600 font-semibold`} variant="ghost">
             Today
           </Badge>
-          <Badge
-            className={`text-yellow-600 font-semibold`}
-            variant="ghost"
-          >
+          <Badge className={`text-yellow-600 font-semibold`} variant="ghost">
             Part-time
           </Badge>
-          <Badge
-            className={`text-purple-600 font-semibold`}
-            variant="ghost"
-          >
+          <Badge className={`text-purple-600 font-semibold`} variant="ghost">
             24LPA
           </Badge>
         </div>
 
         <div className="flex gap-4 mt-5">
-          <Button className="bg-white text-black border border-gray-700 hover:bg-black hover:text-white">Details</Button>
+          <Button
+            className="bg-white text-black border border-gray-700 hover:bg-black hover:text-white"
+            onClick={() => navigate(`/description/${jobId}`)}
+          >
+            Details
+          </Button>
           <Button>Save for later</Button>
         </div>
-
       </div>
     </div>
   );
