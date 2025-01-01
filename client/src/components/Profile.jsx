@@ -6,8 +6,15 @@ import { Contact, Mail, Pen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import AppliedJobsTable from "./AppliedJobsTable";
+import UpdateProfile from "./UpdateProfile";
 
 const Profile = () => {
+  
+  let activeResume = false;
+
+  const [open, setOpen] = useState(false)
+
+
   const skills = [
     "JavaScript",
     "C++",
@@ -18,7 +25,6 @@ const Profile = () => {
     "Git",
   ];
 
-  let activeResume = false;
 
   const handleResumeInvalid = () => {
     toast.error("No attached resume found!");
@@ -56,7 +62,7 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <Button>
+          <Button onClick={() => setOpen(true)}>
             <Pen className="text-right" variant="outline" />
           </Button>
         </div>
@@ -93,6 +99,11 @@ const Profile = () => {
       <div className="max-w-7xl mt-10 mx-auto bg-white rounded-2xl">
         <h1 className="text-xl font-semibold">All applied Jobs</h1>
         <AppliedJobsTable />
+      </div>
+
+
+      <div>
+        <UpdateProfile open={open} setOpen={setOpen} />
       </div>
     </>
   );
