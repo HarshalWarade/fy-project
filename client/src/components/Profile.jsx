@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import AppliedJobsTable from "./AppliedJobsTable";
 import UpdateProfile from "./UpdateProfile";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
   
@@ -14,16 +15,17 @@ const Profile = () => {
 
   const [open, setOpen] = useState(false)
 
+  const {user} = useSelector(store => store.auth)
 
-  const skills = [
-    "JavaScript",
-    "C++",
-    "Python",
-    "Blender",
-    "Data Structures",
-    "SQL",
-    "Git",
-  ];
+  // const skills = [
+  //   "JavaScript",
+  //   "C++",
+  //   "Python",
+  //   "Blender",
+  //   "Data Structures",
+  //   "SQL",
+  //   "Git",
+  // ];
 
 
   const handleResumeInvalid = () => {
@@ -40,23 +42,22 @@ const Profile = () => {
               <AvatarImage src="https://github.com/shadcn.png" />
             </Avatar>
             <div className="flex flex-col gap-4">
-              <div className="flex items-center font-semibold text-lg gap-[10px]">
-                <h1>FirstName</h1>
-                <h1>LastName</h1>
+              <div className="flex items-center font-semibold text-lg gap-[4px]">
+                <h1>{user?.firstName}</h1>
+                <h1>{user?.lastName}</h1>
               </div>
               <div>
                 <p className="text-sm text-gray-600">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Inventore soluta dolore dolorum ea sunt velit!
+                  {user?.profile.bio}
                 </p>
                 <div className="flex items-center gap-4 mt-5">
                   <div className="flex items-center gap-1">
                     <Mail />
-                    <span>something@gmail.com</span>
+                    <span>{user?.email}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Contact />
-                    <span>4738291040</span>
+                    <span>{user?.phoneNumber}</span>
                   </div>
                 </div>
               </div>
@@ -68,8 +69,8 @@ const Profile = () => {
         </div>
 
         <div className="flex mt-5 gap-2">
-          {skills.length != 0 ? (
-            skills.map((item, index) => (
+          {user?.profile.skills.length != 0 ? (
+            user?.profile.skills.map((item, index) => (
               <div
                 key={index}
                 className="flex items-center content-center justify-center bg-slate-200 text-gray-700 px-3 py-1 rounded-full"

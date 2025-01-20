@@ -144,7 +144,7 @@ export const updateProfile = async (req, res) => {
             user.phoneNumber = phoneNumber
         }
         if(bio) {
-            user.profile.bio = profile.bio
+            user.profile.bio = bio
         }
         if(skills) {
             user.profile.skills = skillsArray
