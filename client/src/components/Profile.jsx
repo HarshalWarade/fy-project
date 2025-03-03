@@ -3,7 +3,7 @@ import Navbar from "./ui/Navbar";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Contact, Mail, Pen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import AppliedJobsTable from "./AppliedJobsTable";
 import UpdateProfile from "./UpdateProfile";
@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 const Profile = () => {
   
   let activeResume = false;
-
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
   const {user} = useSelector(store => store.auth)
@@ -27,10 +27,23 @@ const Profile = () => {
   //   "Git",
   // ];
 
-
   const handleResumeInvalid = () => {
-    toast.error("No attached resume found!");
+    if (!user?.profile?.resume) {
+      toast.error("No resume attached");
+      return;
+    }
+  
+    const resumeLink = user.profile.resume.trim();
+  
+    if (!resumeLink.startsWith("http://") && !resumeLink.startsWith("https://")) {
+      toast.error("Invalid resume link");
+      return;
+    }
+  
+    window.location.href = resumeLink;
   };
+  
+  
 
   return (
     <>

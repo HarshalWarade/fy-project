@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   
   firstName: { type: String, required: true },
-  middleName: { type: String, required: true },
+  middleName: { type: String },
   lastName: { type: String, required: true },
   gender: { type: String, enum: ['male', 'female'], required: true },
   email: { type: String, required: true, unique: true },
@@ -14,11 +14,11 @@ const userSchema = new mongoose.Schema({
 
   profile: {  
     
-    bio: {type: String},
-    resume: {type: String},
+    bio: {type: String, default: "" },
+    resume: { type: String, default: "" },
     skills: [{type: String}],
-    videoIntroduction: {type: String},
-    resumeOriginalName: {type: String},
+    videoIntroduction: {type: String, default: "" },
+    resumeOriginalName: {type: String, default: "" },
     company: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Company'

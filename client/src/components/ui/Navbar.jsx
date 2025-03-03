@@ -4,12 +4,32 @@ import { Button } from "./button";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { toast, Toaster } from "sonner";
 import { LogOut, User2 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import store from "@/redux/store";
+import axios from "axios";
+import { setUser } from "@/redux/authSlice";
+import { USER_API_ENDPOINT } from "@/utils/constant";
 
 const Navbar = () => {
-  const {user} = useSelector(store => store.auth)
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const logOutHandler = async () => {
+    try {
+      const res = await axios.get(`${USER_API_ENDPOINT}/logout`, {
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        dispatch(setUser(null));
+        navigate("/");
+        toast.success(res.data.message);
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message);
+    }
+  };
+
   return (
     <>
       <div className="bg-white">
@@ -67,6 +87,7 @@ const Navbar = () => {
                     <div className="flex w-fit items-center gap-3 text-gray-600">
                       <LogOut />
                       <Button
+                        onClick={logOutHandler}
                         variant="link"
                         className="outline-none border-none"
                       >

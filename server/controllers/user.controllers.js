@@ -18,18 +18,14 @@ export const register = async (req, res) => {
                 success: false
             })
         }
-
-        const hashedPassword = await bcrypt.hash(password, 16)
-
+        const hashedPassword = await bcrypt.hash(password, 10)
         await User.create({
             firstName, lastName, middleName, gender, email, country, password: hashedPassword, phoneNumber, role
         })
-
         return res.status(201).json({
             message: "Account created successfully!",
             success: true
         })
-
     } catch (err) {
         console.log(`Error at register controller backend: ${err}`)
     }
@@ -38,14 +34,12 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const {email, password, role} = req.body
-        
         if( !email || !password || !role ) {
             return res.status(400).json({
                 message: "Some fileds are missing",
                 success: false
             })
         }
-        
         let user = await User.findOne({email})
         if(!user) {
             return res.status(400).json({
@@ -53,28 +47,23 @@ export const login = async (req, res) => {
                 success: false
             })
         }
-        
         const isPasswordCorrect = await bcrypt.compare(password, user.password)
-        
         if(!isPasswordCorrect) {
             return res.status(400).json({
                 message: "Incorrect Credentials!",
                 success: false
             })
         }
-        
         if(role != user.role) {
             return res.status(400).json({
                 message: "This ain't your role!",
                 success: false
             })
         }
-        
         const tokenData = {
             userId: user._id
         }
         const token = jwt.sign(tokenData, process.env.SECRETKEY, {expiresIn: '1d'})
-        
         user = {
             _id: user._id,
             firstName: user.firstName,
@@ -85,13 +74,11 @@ export const login = async (req, res) => {
             role: user.role,
             profile: user.profile
         }
-        
         return res.status(200).cookie('token', token, {maxAge: 1*24*60*60*1000, httpsOnly: true, sameSite: 'strict'}).json({
             message: `Welcome back, ${user.firstName}!`,
             user,
             success: true
         })
-
     } catch (err) {
         console.log(`Error occured at login controller backend: ${err}`)
     }
@@ -110,19 +97,13 @@ export const logout = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-        const { firstName, lastName, email, phoneNumber, bio, skills } = req.body
-
+        const { firstName, lastName, email, phoneNumber, bio, skills, resume } = req.body
         const file = req.file
-
-
         let skillsArray
-
         if(skills) {
             skillsArray = skills.split(",")
         }
-
-        const userId = req.id // check for errors once in live (_)       
-
+        const userId = req.id // check for errors once in live (_) i think so ... 
         let user = await User.findById(userId)
         if(!user) {
             return res.status(400).json({
@@ -130,7 +111,6 @@ export const updateProfile = async (req, res) => {
                 success: false
             })
         }
-
         if(firstName) {
             user.firstName = firstName
         }
@@ -149,9 +129,10 @@ export const updateProfile = async (req, res) => {
         if(skills) {
             user.profile.skills = skillsArray
         }
-
+        if(resume) {
+            user.profile.resume = resume
+        }
         await user.save()
-
         user = {
             _id: user._id,
             firstName: user.firstName,
@@ -160,16 +141,14 @@ export const updateProfile = async (req, res) => {
             phoneNumber: user.phoneNumber,
             gender: user.gender,
             role: user.role,
-            profile: user.profile
+            profile: user.profile,
+            resume: user.profile.resume
         }
-
         return res.status(200).json({
             message: "Profile Updated Successfully",
             user,
             success: true
         })
-        
-
     } catch (err) {
         console.log(`error at updateProfile controller backend: ${err}`)
     }
